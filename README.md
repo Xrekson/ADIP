@@ -42,18 +42,3 @@ This system decouples document ingestion from heavy machine learning processing 
 3. **Background Processing:** A decoupled FastAPI worker picks up the message and sends the document to **Azure Document Intelligence**.
 4. **Data Persistence:** The extracted structured data is validated and stored in **PostgreSQL**.
 5. **Notification:** The worker broadcasts a "processing complete" event via **WebSockets**, instantly updating the Angular UI.
-
----
-
-## 💻 Getting Started
-
-### Prerequisites
-* Python 3.10+
-* Node.js 20+ & Angular CLI 19
-* Docker & Docker Compose
-* An active Azure account with Service Bus and Document Intelligence resources provisioned.
-
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/yourusername/e-auction-document-pipeline.git](https://github.com/yourusername/e-auction-document-pipeline.git)
-cd e-auction-document-pipeline
