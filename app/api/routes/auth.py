@@ -41,4 +41,5 @@ async def login(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
 
     token = create_access_token({"sub": user.id, "role": user.role})
-    return {"access_token": token, "token_type": "bearer"}
+    print("User Data",user.full_name, user.role)
+    return {"access_token": token, "token_type": "bearer","full_name":user.full_name, "role":user.role}
