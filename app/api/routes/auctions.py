@@ -2,20 +2,22 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.database import get_db
-from app.models.auction import Auction, Lot, AuctionStatus
-from app.models.user import UserRole
 from app.api.deps import require_role
+from app.database import get_db
+from app.models.auction import Auction, AuctionStatus, Lot
+from app.models.user import UserRole
 from app.schemas.auction import AuctionCreate, AuctionOut, LotOut
 
 router = APIRouter(prefix="/api/auctions", tags=["auctions"])
 
 
-@router.post("/", response_model=AuctionOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "create", response_model=AuctionCreate, status_code=status.HTTP_201_CREATED
+)
 async def create_auction(
     payload: AuctionCreate,
     db: AsyncSession = Depends(get_db),
-    current_user = Depends(require_role(UserRole.AUCTIONEER, UserRole.ADMIN)),
+    current_user=Depends(require_role(UserRole.AUCTIONEER, UserRole.ADMIN)),
 ):
     """Create a new draft auction (Restricted to Auctioneers and Admins)."""
     auction = Auction(
@@ -23,7 +25,7 @@ async def create_auction(
         starts_at=payload.starts_at,
         ends_at=payload.ends_at,
         auctioneer_id=current_user.id,
-        status=AuctionStatus.DRAFT
+        status=AuctionStatus.DRAFT,
     )
     db.add(auction)
     await db.commit()
@@ -40,10 +42,10 @@ async def list_auctions(
     stmt = select(Auction)
     if status:
         stmt = stmt.where(Auction.status == status)
-    
+
     # Order by soonest ending
     stmt = stmt.order_by(Auction.ends_at.asc())
-    
+
     result = await db.execute(stmt)
     return result.scalars().all()
 
@@ -56,10 +58,10 @@ async def get_auction(
     """Get the details of a specific auction."""
     result = await db.execute(select(Auction).where(Auction.id == auction_id))
     auction = result.scalar_one_or_none()
-    
+
     if not auction:
         raise HTTPException(status_code=404, detail="Auction not found")
-    
+
     return auction
 
 

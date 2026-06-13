@@ -5,13 +5,18 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import get_settings
-from app.database import engine, Base
-from app.api.routes import auth, documents, bids
+from app.api.routes import auctions, auth, bids, documents
 from app.api.websockets.endpoints import router as ws_router
+from app.config import get_settings
+from app.database import Base, engine
 from app.workers.document_worker import run_worker
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    filename="app.log",  # File where logs will be stored
+    filemode="a",  # 'a' to append logs, 'w' to overwrite each run
+    level=logging.INFO,  # Capture INFO, WARNING, ERROR, and CRITICAL
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log structure
+)
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
@@ -29,7 +34,7 @@ async def lifespan(app: FastAPI):
     global _worker_task
     _worker_task = asyncio.create_task(run_worker())
 
-    yield   # app is running
+    yield  # app is running
 
     # ── Shutdown ─────────────────────────────────────────────
     if _worker_task:
@@ -62,6 +67,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(documents.router)
 app.include_router(bids.router)
+app.include_router(auctions.router)
 app.include_router(ws_router)
 
 

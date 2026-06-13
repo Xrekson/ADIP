@@ -1,10 +1,14 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
 from app.models.auction import AuctionStatus
+
 
 # --- Existing Bid Schemas ---
 class BidCreate(BaseModel):
     amount: float
+
 
 class BidOut(BaseModel):
     id: str
@@ -13,11 +17,13 @@ class BidOut(BaseModel):
     placed_at: datetime
     model_config = {"from_attributes": True}
 
+
 # --- New Auction Schemas ---
 class AuctionCreate(BaseModel):
     title: str
     starts_at: datetime
     ends_at: datetime
+
 
 class AuctionOut(BaseModel):
     id: str
@@ -27,6 +33,7 @@ class AuctionOut(BaseModel):
     ends_at: datetime
     auctioneer_id: str
     model_config = {"from_attributes": True}
+
 
 # --- New Lot Schemas ---
 class LotOut(BaseModel):
